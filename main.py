@@ -59,6 +59,7 @@ def seed_users_and_posts(session: Session):
 
 if __name__ == '__main__':
     engine = create_engine(url="sqlite:///demo.db")
+    Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
 
     My_Session = sessionmaker(engine)

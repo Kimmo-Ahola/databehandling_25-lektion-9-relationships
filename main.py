@@ -32,7 +32,8 @@ class Post(Base):
 
     # FK
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-    # relationship
+
+    # relationship. A post belongs to one user = no List
     user: Mapped["User"] = relationship("User", back_populates="posts")
 
     def __repr__(self) -> str:

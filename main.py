@@ -1,5 +1,5 @@
 from sqlalchemy import Integer, MetaData, String, Text, ForeignKey, create_engine
-from sqlalchemy.orm import relationship, DeclarativeBase, Mapped, mapped_column, Session, sessionmaker
+from sqlalchemy.orm import relationship, DeclarativeBase, Mapped, mapped_column, Session, sessionmaker, joinedload
 from typing import List
 
 class Base(DeclarativeBase):
@@ -69,23 +69,38 @@ if __name__ == '__main__':
 
     with My_Session() as session:
         number_of_stars = 50
-        print(number_of_stars*'*')
-        print("Printing using explicit join".center(number_of_stars))
-        print(number_of_stars*'*')
-        first_user = session.query(User).first()
-        if first_user:
-            results = session.query(User, Post)\
-                .where(User.id == first_user.id)\
-                .join(Post)\
-                .all()
-
-            for user, post in results:
-                print(user, post)
 
         print("\n\n\n")
         print(number_of_stars*'*')
-        print("Printing using my relationship".center(number_of_stars))
+        print("Printing using Tuple style join".center(number_of_stars))
         print(number_of_stars*'*')
-        first_user = session.query(User).first()
-        if first_user:
-            print(first_user, first_user.posts)
+
+        tuple_join = session.query(User, Post).join(Post).all()
+
+        for user, post in tuple_join:
+            # The user info is printed several times
+            print(user, post)
+        
+        print("\n\n\n")
+        print(number_of_stars*'*')
+        print("Printing using joinedload".center(number_of_stars))
+        print(number_of_stars*'*')
+ 
+        # Create a join for all users
+        joined_users = session.query(User)\
+            .options(joinedload(User.posts))\
+            .all()
+        
+        for user in joined_users:
+            # The user info is only printed once
+            print(user, user.posts)
+
+        print("\n\n\n")
+        print(number_of_stars*'*')
+        print("Printing using lazy loading".center(number_of_stars))
+        users_lazy_load = session.query(User).all()
+
+        for user in users_lazy_load:
+            # Every time we use user.posts we make a NEW QUERY
+            print(user)
+            print(user.posts)
